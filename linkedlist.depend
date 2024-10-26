@@ -1,0 +1,8 @@
+# depslib dependency file v1.0
+1729963475 source:d:\abcd\dsa_brand_new_serie\linkedlist\main.cpp
+	<iostream>
+	<vector>
+	<stack>
+	<unordered_set>
+	<stack>
+
