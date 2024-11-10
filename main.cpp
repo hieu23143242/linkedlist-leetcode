@@ -398,7 +398,7 @@ void reorderList(ListNode* head) {
 }
 
 ListNode* removeElements(ListNode* head, int val) {
-    if (head == nullptr) return ;
+    if (head == nullptr) return head;
     while (head->val == val) {
         ListNode* newHead = head->next;
         delete head;
@@ -420,6 +420,452 @@ ListNode* removeElements(ListNode* head, int val) {
     return head;
 }
 
+ListNode* reverseListII(ListNode* head) {
+    if (head == nullptr || head->next == nullptr) return head;
+    ListNode* prev = nullptr;
+    ListNode* current = head;
+    while (current != nullptr) {
+        ListNode* next = current->next;
+        current->next = prev;
+        prev = current;
+        current = next;
+    }
+    return prev;
+}
+
+bool isPalindrome(ListNode* head) {
+    if (head == nullptr || head->next == nullptr) return true;
+    stack<ListNode*> stk;
+    ListNode* slow = head;
+    ListNode* fast = head;
+    while (fast != nullptr && fast->next != nullptr) {
+        slow = slow->next;
+        fast = fast->next->next;
+    }
+    while (slow != nullptr) {
+        stk.push(slow);
+        slow = slow->next;
+    }
+    ListNode* current = head;
+    while (!stk.empty()) {
+        if (stk.top()->val != current->val) return false;
+        current = current->next;
+        stk.pop();
+    }
+    return true;
+}
+
+void deleteNode(ListNode* node) {
+    node->val = node->next->val;
+    node->next = node->next->next;
+}
+
+ListNode* oddEvenList(ListNode* head) {
+    if (head == nullptr || head->next == nullptr) return head;
+    ListNode* odd = head;
+    ListNode* even = head->next;
+    ListNode* evenHead = even;
+    while (even != nullptr && even->next != nullptr) {
+        odd->next = even->next;
+        odd = odd->next;
+        even->next = odd->next;
+        even = even->next;
+    }
+    odd->next = evenHead;
+    return head;
+}
+
+class Solution {
+private:
+    vector<int> v;
+public:
+    Solution(ListNode* head) {
+        ListNode* current = head;
+        while (current != nullptr) {
+            v.push_back(current->val);
+            current = current->next;
+        }
+    }
+
+    int getRandom() {
+        if (this->v.size() == 1) return this->v[0];
+        return this->v[rand() % (this->v.size())];
+    }
+};
+
+ListNode* addTwoNumbersII(ListNode* l1, ListNode* l2) {
+    stack<int> stk;
+    stack<int> stk1;
+    stack<int> stk2;
+    ListNode* dummy = new ListNode(0);
+    int carry = 0;
+    while (l1 != nullptr || l2 != nullptr) {
+        if (l1 != nullptr) {
+            stk1.push(l1->val);
+            l1 = l1->next;
+        }
+        if (l2 != nullptr) {
+            stk2.push(l2->val);
+            l2 = l2->next;
+        }
+    }
+    while (!stk1.empty() || !stk2.empty()) {
+        int sum = carry;
+        if (!stk1.empty()) {
+            sum += stk1.top();
+            stk1.pop();
+        }
+        if (!stk2.empty()) {
+            sum += stk2.top();
+            stk2.pop();
+        }
+        stk.push(sum%10);
+        carry = sum/10;
+    }
+    if (carry != 0) stk.push(carry);
+    ListNode* current = dummy;
+    while (!stk.empty()) {
+        current->next = new ListNode(stk.top());
+        stk.pop();
+        current = current->next;
+    }
+    ListNode* ans = dummy->next;
+    delete dummy;
+    return ans;
+}
+
+class MyCircularQueue {
+private:
+    ListNode* head;
+    ListNode* tail;
+    int maxLength;
+    int currentLength;
+public:
+    MyCircularQueue(int k) {
+        this->head = nullptr;
+        this->tail = nullptr;
+        this->maxLength = k;
+        this->currentLength = 0;
+    }
+    bool enQueue(int value) {
+        if (this->isFull()) return false;
+        ListNode* node = new ListNode(value);
+        if (this->isEmpty()) {
+            this->head = node;
+            this->tail = node;
+            this->tail->next = this->head;
+        } else {
+            this->tail->next = node;
+            node->next = this->tail->next;
+            this->tail = node;
+        }
+        this->currentLength ++;
+        return true;
+    }
+    bool deQueue() {
+        if (this->isEmpty()) return false;
+        if (this->currentLength == 1) {
+            delete head;
+            this->head = nullptr;
+            this->tail = nullptr;
+        } else {
+            ListNode* del = this->head;
+            this->head = del->next;
+            this->tail->next = this->head;
+            delete del;
+        }
+        this->currentLength --;
+        return true;
+    }
+    int Front() {
+        if (this->isEmpty()) return -1;
+        return this->head->val;
+    }
+    int Rear() {
+        if (this->isEmpty()) return -1;
+        return this->tail->val;
+    }
+    bool isEmpty() {
+        return this->currentLength == 0;
+    }
+    bool isFull() {
+        return this->currentLength == this->maxLength;
+    }
+};
+
+class MyHashSet {
+private:
+    ListNode* head;
+public:
+    MyHashSet() {
+        this->head = nullptr;
+    }
+    void add(int key) {
+        if (this->head == nullptr) {
+            this->head = new ListNode(key);
+            return ;
+        }
+        ListNode* current = this->head;
+        while (current->next != nullptr) {
+            if (current->val == key) return;
+            current = current->next;
+        }
+        if (current->val == key) return;
+        current->next = new ListNode(key);
+    }
+
+    void remove(int key) {
+        if (this->head == nullptr) return ;
+        if (this->head->val == key) {
+            ListNode* del = head;
+            this->head = del->next;
+            delete del;
+            return;
+        }
+        ListNode* prev = nullptr;
+        ListNode* current = this->head;
+        while (current != nullptr) {
+            if (current->val == key) {
+                prev->next = current->next;
+                delete current;
+                return ;
+            }
+            prev = current;
+            current = current->next;
+        }
+    }
+    bool contains(int key) {
+        if (this->head == nullptr) return false;
+        ListNode* current = this->head;
+        while (current != nullptr) {
+            if (current->val == key) return true;
+            current = current->next;
+        }
+        return false;
+    }
+};
+
+class MyLinkedList {
+private:
+    ListNode* head;
+    ListNode* tail;
+    int length;
+public:
+    MyLinkedList() {
+        this->head = nullptr;
+        this->tail = nullptr;
+        this->length = 0;
+    }
+    int get(int index) {
+        if (index >= length) return -1;
+        ListNode* current = head;
+        for (int i=0; i<index; i++) {
+            current = current->next;
+        }
+        return current->val;
+    }
+    void addAtHead(int val) {
+        ListNode* node = new ListNode(val);
+        if (head == nullptr) {
+            head = node;
+            tail = node;
+            length ++;
+            return ;
+        }
+        node->next = head;
+        head = node;
+        length ++;
+    }
+    void addAtTail(int val) {
+        ListNode* node = new ListNode(val);
+        if (head == nullptr) {
+            head = node;
+            tail = node;
+            length ++;
+            return ;
+        }
+        tail->next = node;
+        tail = node;
+        length ++;
+    }
+    void addAtIndex(int index, int val) {
+        if (index < 0 || index > length) return;
+        if (index == 0) {
+            this->addAtHead(val);
+            return;
+        }
+        ListNode* current = head;
+        for (int i = 0; i < index - 1; i++) {
+            current = current->next;
+        }
+        ListNode* node = new ListNode(val);
+        node->next = current->next;
+        current->next = node;
+        length++;
+        if (node->next == nullptr) {
+            tail = node;
+        }
+    }
+    void deleteAtIndex(int index) {
+        if (index < 0 || index >= length) return;
+        if (index == 0) {
+            ListNode* del = head;
+            head = del->next;
+            delete del;
+            if (head == nullptr) tail = nullptr;
+            length --;
+            return ;
+        }
+        ListNode* current = head;
+        for (int i=0; i<index-1; i++) {
+            current = current->next;
+        }
+        ListNode* del = current->next;
+        current->next = del->next;
+        delete del;
+        length --;
+        if (current->next == nullptr) {
+            tail = current;
+        }
+    }
+};
+
+vector<ListNode*> splitListToParts(ListNode* head, int k) {
+    std::vector<ListNode*> ans(k, nullptr);
+    int length = 0;
+    ListNode* current = head;
+    while (current != nullptr) {
+        current = current->next;
+        length ++;
+    }
+    int bunchSize = length / k;
+    int ex = length < k ? 0 : length % k;
+    current = head;
+    for (int i=0; i<k; i++) {
+        ListNode* _head = current;
+        int currentBunchSize = bunchSize + (i<ex ? 1: 0)-1;
+        for (int j=0; j<currentBunchSize; j++) {
+            if (current != nullptr) current = current->next;
+        }
+        if (current != nullptr) {
+            ListNode* next = current->next;
+            current->next = nullptr;
+            current = next;
+        }
+        ans[i] = (_head);
+    }
+    return ans;
+}
+
+int numComponents(ListNode* head, vector<int>& nums) {
+    int ans = 0;
+    unordered_set<int> set;
+    for (int num: nums) {
+        set.insert(num);
+    }
+    ListNode* current = head;
+    int connecting = false;
+    while (current != nullptr) {
+        if (set.find(current->val) != set.end()) {
+            if (!connecting) {
+                ans ++;
+                connecting = true;
+            }
+        } else {
+            connecting = false;
+        }
+        current = current->next;
+    }
+    return ans;
+}
+
+ListNode* modifiedList(vector<int>& nums, ListNode* head) {
+    unordered_set<int> s;
+    for (int num: nums) {
+        s.insert(num);
+    }
+    ListNode* dummy = new ListNode(0);
+    ListNode* current = dummy;
+    while (head != nullptr) {
+        if (s.find(head->val) == s.end()) {
+            current->next = head;
+            current = current->next;
+        }
+        head = head->next;
+    }
+    current->next = nullptr;
+    ListNode* ans = dummy->next;
+    delete dummy;
+    return ans;
+}
+
+ListNode* doubleIt(ListNode* head) {
+        stack<int> s;
+        ListNode* current = head;
+        while (current != nullptr) {
+            s.push(current->val);
+            current = current->next;
+        }
+        current = head;
+        int carry = 0;
+        while (!s.empty()) {
+            int top = s.top();
+            s.pop();
+            int newVal = top * 2 + carry;
+            current->val = newVal % 10;
+            carry = newVal / 10;
+            if (current->next == nullptr && carry != 0) {
+                current->next = new ListNode(carry);
+                break;
+            }
+
+            current = current->next;
+        }
+        ListNode* newHead = nullptr;
+        while (head != nullptr) {
+            ListNode* current = head;
+            head = head->next;
+            current->next = newHead;
+            newHead = current;
+        }
+        return newHead;
+    }
+
+class Solution {
+public:
+    ListNode* insertGreatestCommonDivisors(ListNode* head) {
+        if (head == nullptr || head->next == nullptr) return head;
+        ListNode* current = head;
+        while (current != nullptr && current->next != nullptr) {
+            int gcdVal = std::gcd(current->val, current->next->val);
+            ListNode* node = new ListNode(gcdVal);
+            node->next = current->next;
+            current->next = node;
+            current = node->next;
+        }
+        return head;
+    }
+};
+
+ListNode* mergeNodes(ListNode* head) {
+    ListNode* dummy = new ListNode(0);
+    ListNode* currentResult = dummy;
+    ListNode* current = head->next;
+    int sum = 0;
+    while (current != nullptr) {
+        if (current->val == 0) {
+            currentResult->next = new ListNode(sum);
+            currentResult = currentResult->next;
+            sum = 0;
+        } else {
+            sum += current->val;
+        }
+        current = current->next;
+    }
+    ListNode* ans = dummy->next;
+    delete dummy;
+    return ans;
+}
 
 int main() {
     int n;
@@ -430,8 +876,15 @@ int main() {
         cin>>k;
         insertAtTail(head, k);
     }
-//    print(head);
-    reorderList(head);
+
+    print(head);
+    cout<<endl;
+//    ListNode* cur = head;
+//    for (int i=0; i<3; i++) {
+//        cout<<cur->val<<" ";
+//        cur = cur->next;
+//    }
+//    vector<ListNode*> res = splitListToParts(head, 3);
 
     return 0;
 }
